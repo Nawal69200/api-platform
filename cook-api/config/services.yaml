@@ -22,8 +22,21 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    # Enregistrement explicite du listener pour la mise à jour de createdAt
+    App\EventListener\CreatedAtListener:
+        tags:
+            - { name: doctrine.event_listener, event: prePersist }
     
     # Enregistrement explicite du listener pour la mise à jour de updatedAt
-    App\EventListener\RecipeUpdatedAtListener:
+    App\EventListener\UpdatedAtListener:
         tags:
             - { name: doctrine.event_listener, event: preUpdate }
+
+    # Enregistrement explicite du listener pour la gestion des slugs
+    App\EventListener\SlugListener:
+        tags:
+            - { name: doctrine.event_listener, event: prePersist }
+            - { name: doctrine.event_listener, event: preUpdate }
+
+    

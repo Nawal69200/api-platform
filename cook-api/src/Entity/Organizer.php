@@ -24,15 +24,16 @@ class Organizer
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $phone = null;
 
-    #[ORM\Column]
-    private ?bool $isUser = null;
-
     /**
      * @var Collection<int, Event>
      */
     #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'organizer', orphanRemoval: true)]
     private Collection $events;
 
+    #[ORM\OneToOne(inversedBy: 'organizer', targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+    
     public function __construct()
     {
         $this->events = new ArrayCollection();
@@ -79,18 +80,6 @@ class Organizer
         return $this;
     }
 
-    public function isUser(): ?bool
-    {
-        return $this->isUser;
-    }
-
-    public function setIsUser(bool $isUser): static
-    {
-        $this->isUser = $isUser;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Event>
      */
@@ -117,6 +106,18 @@ class Organizer
                 $event->setOrganizer(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }

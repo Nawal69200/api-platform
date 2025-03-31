@@ -27,7 +27,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var list<string> The user roles
      */
     #[ORM\Column]
-    private array $roles = [];
+    private array $roles = ['ROLE_USER'];
 
     /**
      * @var string The hashed password
@@ -50,9 +50,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Comment>
      */
-    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'user', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'user', cascade: ['remove'], orphanRemoval: true)]
     private Collection $comments;
-
+    
     /**
      * @var Collection<int, FoodInfo>
      */
@@ -62,9 +62,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Favorite>
      */
-    #[ORM\OneToMany(targetEntity: Favorite::class, mappedBy: 'user', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Favorite::class, mappedBy: 'user', cascade: ['remove'], orphanRemoval: true)]
     private Collection $favorites;
-
+    
     /**
      * @var Collection<int, Participant>
      */
@@ -116,9 +116,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
+        // Si l'utilisateur est admin
+        if ($this->isAdmin()) {
+            $roles[] = 'ROLE_ADMIN';
+        }
 
         return array_unique($roles);
     }
+
+    public function isAdmin(): bool
+{
+    return in_array('ROLE_ADMIN', $this->roles);
+}
+
 
     /**
      * @param list<string> $roles

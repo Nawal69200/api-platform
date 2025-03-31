@@ -3,55 +3,36 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Post;
-use App\Controller\RecipeController;
 use App\Repository\RecipeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: RecipeRepository::class)]
-#[ApiResource(
-    operations: [
-        new Post(
-            uriTemplate: '/recipes/{id}/adjust-ingredients', // L'URL de l'opération
-            controller: RecipeController::class,  // Le contrôleur qui gère cette logique
-            normalizationContext: ['groups' => ['recipe:list']],  // Groupes pour la réponse
-            denormalizationContext: ['groups' => ['recipe:write']]  // Groupes pour la demande
-        ),
-    ]
-)]
+#[ApiResource()]
 
 class Recipe
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['recipe:list', 'recipe:details'])]
     private ?int $id = null;
 
-    #[Groups(['recipe:list', 'recipe:details', 'recipe:write'])]
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
-    #[Groups(['recipe:list', 'recipe:details', 'recipe:write'])]
     #[ORM\Column(length: 255)]
     private ?string $slug = null;
 
-    #[Groups(['recipe:list', 'recipe:details', 'recipe:write'])]
     #[ORM\Column]
     private ?int $prepTime = null;
 
-    #[Groups(['recipe:details', 'recipe:write'])] // UNIQUEMENT pour le détail
     #[ORM\Column(nullable: true)]
     private ?int $cookTime = null;
 
-    #[Groups(['recipe:list', 'recipe:details', 'recipe:write'])]
     #[ORM\Column(length: 255)]
     private ?string $image = null;
 
-    #[Groups(['recipe:list', 'recipe:details', 'recipe:write'])]
     #[ORM\Column]
     private ?int $servings = null;
 
@@ -65,28 +46,24 @@ class Recipe
      * @var Collection<int, Step>
      */
     #[ORM\OneToMany(targetEntity: Step::class, mappedBy: 'recipe', cascade: ['persist', 'remove'], orphanRemoval: true)]
-    #[Groups(['recipe:details'])]
     private Collection $steps;
 
     /**
      * @var Collection<int, Comment>
      */
     #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'recipe', orphanRemoval: true)]
-    #[Groups(['recipe:details'])]
     private Collection $comments;
 
     /**
      * @var Collection<int, Favorite>
      */
     #[ORM\OneToMany(targetEntity: Favorite::class, mappedBy: 'recipe', orphanRemoval: true)]
-    #[Groups(['recipe:details'])] 
     private Collection $favorites;
 
     /**
      * @var Collection<int, RecipeIngredient>
      */
     #[ORM\OneToMany(targetEntity: RecipeIngredient::class, mappedBy: 'recipe')]
-    #[Groups(['recipe:details'])]
     private Collection $recipeIngredients;
 
    
@@ -307,7 +284,7 @@ class Recipe
 
         return $this;
     }
-
+    
     public function removeRecipeIngredient(RecipeIngredient $recipeIngredient): static
     {
         if ($this->recipeIngredients->removeElement($recipeIngredient)) {
@@ -320,18 +297,7 @@ class Recipe
         return $this;
     }
 
-     /**
-     * Mise à jour automatique de la date de modification avant chaque mise à jour
-     */
-    #[ORM\PreUpdate]
-    public function updateTimestamp(): void
-    {
-        $this->updatedAt = new \DateTimeImmutable();
-    }
-
-    // Méthodes utiles
-
-        /**
+    /**
      * Ajuste les quantités des ingrédients en fonction du nombre de portions
      *
      * @param int $newServings Le nombre de portions souhaité
@@ -353,3 +319,4 @@ class Recipe
         $this->setServings($newServings);
     }
 }
+

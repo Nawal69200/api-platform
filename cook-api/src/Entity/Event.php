@@ -59,8 +59,9 @@ class Event
     #[ORM\OneToMany(targetEntity: Participant::class, mappedBy: 'event')]
     private Collection $participants;
 
-    #[ORM\Column(enumType: EventStatus::class)]
+    #[ORM\Column(type: 'string', enumType: EventStatus::class, length: 20)]
     private ?EventStatus $status = null;
+
 
     public function __construct()
     {

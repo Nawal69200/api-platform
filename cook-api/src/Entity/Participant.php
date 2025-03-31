@@ -27,8 +27,8 @@ class Participant
     #[ORM\JoinColumn(nullable: false)]
     private ?Event $event = null;
 
-    #[ORM\Column(enumType: ParticipantStatus::class)]
-    private ?ParticipantStatus $status = null;
+    #[ORM\Column(type: 'string', enumType: ParticipantStatus::class, length: 20)]
+    private ?ParticipantStatus $status = null;    
 
     public function getId(): ?int
     {

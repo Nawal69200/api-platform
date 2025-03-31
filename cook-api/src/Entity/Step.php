@@ -9,13 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: StepRepository::class)]
-#[ApiResource(
-    normalizationContext: ['groups' => ['step:read']],
-    denormalizationContext: ['groups' => ['step:write']]
-)]
+#[ApiResource()]
 #[ORM\Table(name: 'step', uniqueConstraints: [
-    // Définition d'une contrainte d'unicité sur les colonnes recipe_id et step_order
-    // Cela garantit qu'il n' y aura pas deux étapes avec le même step_order pour une recette donnée
     new ORM\UniqueConstraint(columns: ['recipe_id', 'step_order'])
 ])]
 class Step
